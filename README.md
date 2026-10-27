@@ -106,6 +106,20 @@ shellcheck menu.bash install.sh
 
 For behavioral checks, use a temporary `PASSWORD_STORE_DIR`; never test destructive actions against a real password store.
 
+### Integration tests
+
+```sh
+bash tests/integration.sh
+```
+
+CI (`.github/workflows/ci.yml`) checks syntax and runs the suite against a disposable `PREFIX`. Tests load functions with explicit `PASS_GUM_MENU_LIBRARY=1`; normal sourcing by pass still runs the menu.
+
+- `cmd_menu_entries` listing/sorting over fixture `.gpg` files (pruning `.git`/`.extensions`);
+- `cmd_menu_entry_directories` parent-directory output;
+- `--help` / `-h` exit successfully without changing fixture names or contents;
+- direct and pass-style sourced entrypoints reject missing `gum` with exit 1; fixture names and checksums remain unchanged.
+
+The real password store is never read or touched: every run exports a fresh `mktemp -d` `PREFIX`, and the missing-gum subprocess receives only that temp `PREFIX`. A local `die` fallback preserves the fail-closed missing-gum behavior when `menu.bash` runs outside pass (where the `pass` framework normally provides `die`); under `pass` the framework's `die` still wins.
 ## License
 
 GPL-2.0-only. See [LICENSE](LICENSE).

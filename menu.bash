@@ -294,6 +294,13 @@ cmd_menu_browse() {
 	cmd_menu_entry_actions "$entry"
 }
 
+if ! declare -F die >/dev/null 2>&1; then
+	die() {
+		printf 'Error: %s\n' "$*" >&2
+		exit 1
+	}
+fi
+
 cmd_menu() {
 	local action
 
@@ -327,5 +334,7 @@ cmd_menu() {
 	done
 }
 
-[[ $1 == "help" || $1 == "--help" || $1 == "-h" ]] && cmd_menu_usage
-cmd_menu
+if [[ "${PASS_GUM_MENU_LIBRARY:-0}" != "1" ]]; then
+	[[ ${1:-} == "help" || ${1:-} == "--help" || ${1:-} == "-h" ]] && cmd_menu_usage
+	cmd_menu
+fi
